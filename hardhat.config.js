@@ -21,15 +21,6 @@ module.exports = {
     hardhat: {
       chainId: 1337
     },
-    fantomtest: {
-      url: "https://rpc.testnet.fantom.network/",
-      accounts: [process.env.PRIVATE_KEY],
-      chainId: 4002,
-      live: false,
-      saveDeployments: true,
-      gasMultiplier: 2,
-      allowUnlimitedContractSize: true
-    },
     goerli: {
       url: `https://goerli.infura.io/v3/${process.env.INFURA_KEY}`,
       accounts: [process.env.PRIVATE_KEY],
@@ -37,12 +28,10 @@ module.exports = {
       gasMultiplier: 2,
       allowUnlimitedContractSize: true
     },
-    fantom: {
-      url: "https://rpc.fantom.network",
+    mainnet: {
+      url: `https://mainnet.infura.io/v3/${process.env.INFURA_KEY}`,
       accounts: [process.env.PRIVATE_KEY],
-      chainId: 250,
       live: false,
-      saveDeployments: true,
       gasMultiplier: 2,
       allowUnlimitedContractSize: true
     }
