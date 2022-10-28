@@ -1,5 +1,5 @@
 //SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.3;
 
 import "./Domain.sol";
 
@@ -7,7 +7,7 @@ interface ReverseResolverAuthenticatorInterface {
   function canWrite(uint256 name, uint256[] memory path, address sender) external view returns (bool);
 }
 
-contract ReverseResolverRegistryV1 is AccessControl, ReverseResolverAuthenticatorInterface {
+contract ReverseResolverRegistry is AccessControl, ReverseResolverAuthenticatorInterface {
   bytes32 public constant MANAGER_ROLE = keccak256('MANAGER');
 
   event AuthenticatorSet(uint256 name, address contractAddress);
@@ -28,7 +28,7 @@ contract ReverseResolverRegistryV1 is AccessControl, ReverseResolverAuthenticato
 
   function getResolver(uint256 standardKey) external view returns (address resolverAddress) {
     resolverAddress = reverseResolvers[standardKey];
-    require(resolverAddress != address(0), 'ReverseResolverRegistryV1: address not set');
+    require(resolverAddress != address(0), 'ReverseResolverRegistry: address not set');
   }
 
   function canWrite(uint256 name, uint256[] memory path, address sender) external view override(ReverseResolverAuthenticatorInterface) returns (bool) {
@@ -52,7 +52,7 @@ contract ReverseResolverRegistryV1 is AccessControl, ReverseResolverAuthenticato
 
   function setAuthenticator(uint256 name, ReverseResolverAuthenticatorInterface authenticator) external {
     Domain domain = Domain(contractRegistry.get('Domain'));
-    require(!domain.isSuspended(name), "ReverseResolverRegistryV1: domain suspended");
+    require(!domain.isSuspended(name), "ReverseResolverRegistry: domain suspended");
     require(domain.balanceOf(msg.sender, name) > 0, "ResolverRegistry: not owner");
     authenticators[name] = authenticator;
     emit AuthenticatorSet(name, address(authenticator));

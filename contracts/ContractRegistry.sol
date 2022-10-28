@@ -5,18 +5,18 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 
 // File contracts/ContractRegistryInterface.sol
 
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.3;
 
 interface ContractRegistryInterface {
   function get(string memory contractName) external view returns (address);
 }
 
 
-// File contracts/ContractRegistryV1.sol
+// File contracts/ContractRegistry.sol
 
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.3;
 
-contract ContractRegistryV1 is ContractRegistryInterface, AccessControl {
+contract ContractRegistry is ContractRegistryInterface, AccessControl {
   bytes32 public constant MANAGER_ROLE = keccak256("MANAGER");
   event Set(string contractName, address contractAddress);
 

@@ -1,5 +1,5 @@
 //SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.3;
 
 import "./Domain.sol";
 
@@ -38,7 +38,7 @@ contract EVMReverseResolver {
   // set the reverse for the name.
   function set(uint256 name, uint256[] calldata path) external {
     ReverseResolverAuthenticatorInterface reverseResolverRegistry = ReverseResolverAuthenticatorInterface(contractRegistry.get('ReverseResolverRegistry'));
-    require(reverseResolverRegistry.canWrite(name, path, msg.sender), "EVMReverseResolverV1: not authorized");
+    require(reverseResolverRegistry.canWrite(name, path, msg.sender), "EVMReverseResolver: not authorized");
     uint256 hash = _getHash(name, path);
 
     // unset the existing entry for hash
@@ -68,7 +68,7 @@ contract EVMReverseResolver {
     if (currAddress == msg.sender) {
       reverseLookups[msg.sender] = Entry(0, 0);
     } else {
-      require(reverseResolverRegistry.canWrite(name, path, msg.sender), "EVMReverseResolverV1: not authorized");
+      require(reverseResolverRegistry.canWrite(name, path, msg.sender), "EVMReverseResolver: not authorized");
       reverseLookups[currAddress] = Entry(0, 0);
     }
     entries[name][hash] = address(0);
@@ -79,15 +79,15 @@ contract EVMReverseResolver {
   function get(address target) external view returns (uint256 name, uint256 hash) {
     Domain domain = Domain(contractRegistry.get('Domain'));
     Entry memory entry = reverseLookups[target];
-    require(entry.name != 0 && entry.hash != 0, "EVMReverseResolverV1: does not exist");
-    require(!domain.isSuspended(entry.name), "EVMReverseResolverV1: domain suspended");
+    require(entry.name != 0 && entry.hash != 0, "EVMReverseResolver: does not exist");
+    require(!domain.isSuspended(entry.name), "EVMReverseResolver: domain suspended");
     return (entry.name, entry.hash);
   }
 
   // get the entry for a name / hash pair. used for data clearing.
   function getEntry(uint256 name, uint256 hash) external view returns (address entry) {
     Domain domain = Domain(contractRegistry.get('Domain'));
-    require(!domain.isSuspended(name), "EVMReverseResolverV1: domain suspended");
+    require(!domain.isSuspended(name), "EVMReverseResolver: domain suspended");
     return entries[name][hash];
   }
 

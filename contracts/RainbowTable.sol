@@ -1,6 +1,6 @@
 //SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.3;
 
 interface PoseidonInterface {
   function poseidon(bytes32[3] memory input) external pure returns(bytes32);

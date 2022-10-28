@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 
 // File contracts/ConstraintsInterface.sol
 
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.3;
 
 interface ConstraintsInterface {
   function check(uint256 namespace, uint256 name, bytes memory data) external view;
@@ -14,19 +14,19 @@ interface ConstraintsInterface {
 
 // File contracts/VerifierInterface.sol
 
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.3;
 
 interface VerifierInterface {
   function verifyProof(bytes memory proof, uint[] memory pubSignals) external view returns (bool);
 }
 
 
-// File contracts/ConstraintsV1.sol
+// File contracts/Constraints.sol
 
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.3;
 
 
-contract ConstraintsV1 is ConstraintsInterface, AccessControl {
+contract Constraints is ConstraintsInterface, AccessControl {
   VerifierInterface public _verifier;
   bytes32 public constant MANAGER_ROLE = keccak256("MANAGER");
   mapping(uint256 => bool) _blockedNames;
@@ -41,11 +41,11 @@ contract ConstraintsV1 is ConstraintsInterface, AccessControl {
     uint[] memory pubSignals;
     bytes memory proof;
     (pubSignals, proof) = abi.decode(data, (uint[], bytes));
-    require(pubSignals.length == 2, "ConstraintsV1: Invalid pubSignals length");
-    require(namespace == pubSignals[0], "ConstraintsV1: Proof doesn't match namespace");
-    require(name == pubSignals[1], "ConstraintsV1: Proof doesn't match provided name");
-    require(!_blockedNames[name], "ConstraintsV1: Name blocked");
-    require(_verifier.verifyProof(proof, pubSignals), "ConstraintsV1: Verifier failed");
+    require(pubSignals.length == 2, "Constraints: Invalid pubSignals length");
+    require(namespace == pubSignals[0], "Constraints: Proof doesn't match namespace");
+    require(name == pubSignals[1], "Constraints: Proof doesn't match provided name");
+    require(!_blockedNames[name], "Constraints: Name blocked");
+    require(_verifier.verifyProof(proof, pubSignals), "Constraints: Verifier failed");
   }
 
   function blockNames(

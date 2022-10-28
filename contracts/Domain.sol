@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155URIStorage.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.3;
 
 interface ContractRegistryInterface {
   function get(string memory contractName) external view returns (address);
