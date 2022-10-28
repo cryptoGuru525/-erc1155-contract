@@ -1,11 +1,11 @@
 //SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.3;
 
 import "./Domain.sol";
 
 // File contracts/PricingOracleInterface.sol
 
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.3;
 
 interface PricingOracleInterface {
   function getPriceForName(uint256 name, bytes memory data) external view returns (uint256 price, uint256 priceCentsUsd);
@@ -14,7 +14,7 @@ interface PricingOracleInterface {
 
 // File contracts/RainbowTableInterface.sol
 
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.3;
 
 interface RainbowTableInterface {
   function reveal(uint256[] memory preimage, uint256 hash) external;
@@ -44,12 +44,12 @@ contract LeasingAgent is AccessControl {
 
 
   function setRegistrationPremiumDetails(uint256 premiumStartTime, uint256 premiumEndTime, uint256[] calldata premiumPricePoints) external onlyRole(MANAGER_ROLE) {
-    require(premiumEndTime > premiumStartTime, "LeasingAgentV1: premiumEndTime must be larger than premiumStartTime");
+    require(premiumEndTime > premiumStartTime, "LeasingAgent: premiumEndTime must be larger than premiumStartTime");
 
     // each premiumPricePoint should be smaller than the previous
     for (uint256 i = 0; i < premiumPricePoints.length; i += 1) {
       if (i > 0) {
-        require(premiumPricePoints[i] < premiumPricePoints[i-1], "LeasingAgentV1: premiumPricePoint[i] must be smaller than premiumPricePoint[i-1]");
+        require(premiumPricePoints[i] < premiumPricePoints[i-1], "LeasingAgent: premiumPricePoint[i] must be smaller than premiumPricePoint[i-1]");
       }
     }
 
@@ -65,7 +65,7 @@ contract LeasingAgent is AccessControl {
     bytes memory constraintsProof,
     Domain domain
   ) internal {
-    require(quantity > 0, "LeasingAgentV1: invalid quantity");
+    require(quantity > 0, "LeasingAgent: invalid quantity");
     domain.register(
       msg.sender, // to
       _namespaceId, // namespace
@@ -77,7 +77,7 @@ contract LeasingAgent is AccessControl {
   function _transferToTreasury(uint256 total) internal {
     address payable _treasuryAddress = payable(_contractRegistry.get('Treasury'));
     (bool sent,) = _treasuryAddress.call{value: total}("");
-    require(sent, "LeasingAgentV1: payment not sent");
+    require(sent, "LeasingAgent: payment not sent");
   }
 
   // attempt to register the name.
@@ -88,10 +88,10 @@ contract LeasingAgent is AccessControl {
     bytes[] calldata constraintsProofs,
     bytes[] calldata pricingProofs
   ) public payable {
-    require(_enabled, "LeasingAgentV1: registration disabled");
-    require(names.length == constraintsProofs.length, "LeasingAgentV1: proof length mismatch");
-    require(names.length == pricingProofs.length, "LeasingAgentV1: proof length mismatch");
-    require(names.length == quantities.length, "LeasingAgentV1: quantities length mismatch");
+    require(_enabled, "LeasingAgent: registration disabled");
+    require(names.length == constraintsProofs.length, "LeasingAgent: proof length mismatch");
+    require(names.length == pricingProofs.length, "LeasingAgent: proof length mismatch");
+    require(names.length == quantities.length, "LeasingAgent: quantities length mismatch");
 
     PricingOracleInterface _pricingOracle = PricingOracleInterface(_contractRegistry.get('PricingOracle'));
     Domain _domain = Domain(_contractRegistry.get('Domain'));
@@ -106,7 +106,7 @@ contract LeasingAgent is AccessControl {
       total += price * quantities[i];
     }
     
-    require(msg.value >= total, "LeasingAgentV1: insufficient payment");
+    require(msg.value >= total, "LeasingAgent: insufficient payment");
     uint256 diff = msg.value - total;
     _transferToTreasury(total);
         // return over-payment to sender
@@ -128,8 +128,8 @@ contract LeasingAgent is AccessControl {
     bytes[] calldata pricingProofs,
     uint256[] calldata preimages
   ) external payable {
-    require(preimages.length % 4 == 0, "LeasingAgentV1: incorrect preimage length");
-    require(preimages.length / names.length == 4, "LeasingAgentV1: incorrect preimage length");
+    require(preimages.length % 4 == 0, "LeasingAgent: incorrect preimage length");
+    require(preimages.length / names.length == 4, "LeasingAgent: incorrect preimage length");
     revealImage(names, preimages);
     register(names, quantities, constraintsProofs, pricingProofs);
   }
