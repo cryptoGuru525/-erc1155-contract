@@ -9,7 +9,7 @@ contract ConstraintsVerifier {
         require(proof.length > 0, "PricingOracle: Invalid proof");
         require(pubSignals.length == 2, "PricingOracle: Invalid pubSignals");
         uint256 minLength = pubSignals[1];
-        require(minLength >= 3, "PricingOracle: Length less than 3");
+        require(minLength >= 1, "PricingOracle: Length less than 1");
         return isVerified;
     }   
     
