@@ -29,7 +29,7 @@ async function main() {
   const domain = await Domain.deploy(
     "Ethereum Name Service",
     "WENS",
-    "https://ethereum-domain-api.herokuapp.com/api/token/{id}",
+    "https://ethereum-domain-api.herokuapp.com/api/token/",
     contractRegistry.address
   );
   await domain.deployed();
@@ -40,7 +40,7 @@ async function main() {
     constructorArguments: [
       "Ethereum Name Service",
       "WENS",
-      "https://ethereum-domain-api.herokuapp.com/api/token/{id}",
+      "https://ethereum-domain-api.herokuapp.com/api/token/",
       contractRegistry.address
     ],
     contract: "contracts/Domain.sol:Domain"
