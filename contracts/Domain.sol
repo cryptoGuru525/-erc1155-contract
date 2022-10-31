@@ -42,6 +42,8 @@ contract Domain is ERC1155URIStorage, AccessControl, Ownable {
   string public name;
   // Contract symbol
   string public symbol;
+  // Contract base url
+  string public _baseURI;
   
   ContractRegistryInterface public immutable _contractRegistry;
   // which namespace does the domain belong to?
@@ -249,6 +251,12 @@ contract Domain is ERC1155URIStorage, AccessControl, Ownable {
     uint256 _id
   ) internal view returns (bool) {
     return creators[_id] != address(0);
+  }  
+
+  function exists(
+    uint256 _id
+  ) public view returns (bool) {
+    return _exists(_id);
   }
 
   constructor(string memory _name, string memory _symbol, string memory uri,  ContractRegistryInterface contractRegistry) ERC1155(uri) {
