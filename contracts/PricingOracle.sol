@@ -5,7 +5,7 @@ import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 import "@openzeppelin/contracts/utils/math/SafeCast.sol";
 
 interface PricingOracleInterface {
-  function getPriceForName(uint256 name, bytes memory data) external view returns (uint256 price, uint256 priceCentsUsd);
+  function getPriceForName(uint256 name) external view returns (uint256 price, uint256 priceCentsUsd);
   function convertWeiToUsdCents(uint256 amount) external view returns (uint256 usdCents);
 }
 
@@ -20,7 +20,6 @@ interface VerifierInterface {
 contract PricingOracle is PricingOracleInterface {
   using SafeCast for int256;
   AggregatorV3Interface immutable public priceFeed;
-  VerifierInterface immutable public _verifier;
 
   function _getLatestRoundData() internal view returns (uint256 price) {
     if (address(priceFeed) == address(0)) {
@@ -45,23 +44,15 @@ contract PricingOracle is PricingOracleInterface {
   }
 
   function getPriceForName(
-    uint256 name, 
-    bytes memory data
+    uint256 name
   ) external view override returns (uint256 price, uint256 priceCentsUsd) {
-    uint[] memory pubSignals;
-    bytes memory proof;
-    (pubSignals, proof) = abi.decode(data, (uint[], bytes));
-    require(pubSignals.length == 2, "PricingOracle: Invalid pubSignals");
-    require(pubSignals[0] == name, "PricingOracle: Hash doesnt match");
-    uint256 minLength = pubSignals[1];
-    require(minLength >= 1, "PricingOracle: Length less than 1");
+    uint256 weiPerUSDCent = _getWeiPerUSDCent();
     uint256 namePrice = 500;
-    if (minLength == 3) {
+    if (name == 3) {
       namePrice = 900;
-    } else if (minLength == 4) {
+    } else if (name == 4) {
       namePrice = 700;
     }
-    uint256 weiPerUSDCent = _getWeiPerUSDCent();
     uint256 _price = namePrice * weiPerUSDCent;
     return (_price, namePrice);
   }
@@ -73,8 +64,7 @@ contract PricingOracle is PricingOracleInterface {
     return amount / weiPerUsdCent;
   }
 
-  constructor(VerifierInterface verifier) {
-    _verifier = verifier;
+  constructor() {
     uint256 id;
     assembly {
       id := chainid()
