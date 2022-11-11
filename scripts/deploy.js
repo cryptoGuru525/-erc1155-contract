@@ -130,50 +130,14 @@ async function main() {
     constructorArguments: [contractRegistry.address]
   });
 
-  // 9. Namespace Contract Deployment
-  const Namespace = await hre.ethers.getContractFactory("Namespace");
-  const namespace = await Namespace.deploy();
-  await namespace.deployed();
-  console.log(`Namespace deployed to ${namespace.address}`);
-
-  await hre.run("verify:verify", {
-    address: namespace.address,
-    constructorArguments: []
-  });
-
-  // 10. ConstraintsVerifier Contract Deployment
-  const ConstraintsVerifier = await hre.ethers.getContractFactory(
-    "ConstraintsVerifier"
-  );
-  const constraintsVerifier = await ConstraintsVerifier.deploy();
-  await constraintsVerifier.deployed();
-  console.log(`ConstraintsVerifier deployed to ${constraintsVerifier.address}`);
-
-  await hre.run("verify:verify", {
-    address: constraintsVerifier.address,
-    constructorArguments: []
-  });
-  // 11. ConstraintsFNS Contract Deployment
-  const Constraints = await hre.ethers.getContractFactory("Constraints");
-  const constraints = await Constraints.deploy(constraintsVerifier.address);
-
-  await constraints.deployed();
-  console.log(`Constraints deployed to ${constraints.address}`);
-
-  await hre.run("verify:verify", {
-    address: constraints.address,
-    constructorArguments: [constraintsVerifier.address]
-  });
-
-  // 12. PricingOracle Contract Deployment
+  // 9. PricingOracle Contract Deployment
   const PricingOracle = await hre.ethers.getContractFactory("PricingOracle");
-  const pricingOracle = await PricingOracle.deploy(constraintsVerifier.address);
+  const pricingOracle = await PricingOracle.deploy();
   await pricingOracle.deployed();
   console.log(`PricingOracle deployed to ${pricingOracle.address}`);
 
   await hre.run("verify:verify", {
-    address: pricingOracle.address,
-    constructorArguments: [constraintsVerifier.address]
+    address: pricingOracle.address
   });
 }
 

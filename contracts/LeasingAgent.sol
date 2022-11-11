@@ -8,7 +8,7 @@ import "./Domain.sol";
 pragma solidity ^0.8.3;
 
 interface PricingOracleInterface {
-  function getPriceForName(uint256 name, bytes memory data) external view returns (uint256 price, uint256 priceCentsUsd);
+  function getPriceForName(uint256 name) external view returns (uint256 price, uint256 priceCentsUsd);
   function convertWeiToUsdCents(uint256 amount) external view returns (uint256 usdCents);
 }
 
@@ -62,15 +62,13 @@ contract LeasingAgent is AccessControl {
   function _registerName(
     uint256 name,
     uint256 quantity,
-    bytes memory constraintsProof,
     Domain domain
   ) internal {
     require(quantity > 0, "LeasingAgent: invalid quantity");
     domain.register(
       msg.sender, // to
       _namespaceId, // namespace
-      name, // name id
-      constraintsProof
+      name // name id
     );
   }
 
@@ -84,13 +82,10 @@ contract LeasingAgent is AccessControl {
   // compare it to hash details provided in commit
   function register(
     uint256[] calldata names, 
-    uint256[] calldata quantities,
-    bytes[] calldata constraintsProofs,
-    bytes[] calldata pricingProofs
+    uint256[] calldata lengths, 
+    uint256[] calldata quantities
   ) public payable {
     require(_enabled, "LeasingAgent: registration disabled");
-    require(names.length == constraintsProofs.length, "LeasingAgent: proof length mismatch");
-    require(names.length == pricingProofs.length, "LeasingAgent: proof length mismatch");
     require(names.length == quantities.length, "LeasingAgent: quantities length mismatch");
 
     PricingOracleInterface _pricingOracle = PricingOracleInterface(_contractRegistry.get('PricingOracle'));
@@ -102,7 +97,7 @@ contract LeasingAgent is AccessControl {
 
     // get pricing for names
     for (i = 0; i < names.length; i += 1) {
-      (price, /* priceCentsUsd */) = _pricingOracle.getPriceForName(names[i], pricingProofs[i]);
+      (price, /* priceCentsUsd */) = _pricingOracle.getPriceForName(lengths[i]);
       total += price * quantities[i];
     }
     
@@ -117,21 +112,20 @@ contract LeasingAgent is AccessControl {
     // register names
     emit Registered(names, quantities, msg.value);
     for (i = 0; i < names.length; i += 1) {
-      _registerName(names[i], quantities[i], constraintsProofs[i], _domain);
+      _registerName(names[i], quantities[i], _domain);
     }
   }
 
   function registerWithPreimage(
     uint256[] calldata names, 
     uint256[] calldata quantities,
-    bytes[] calldata constraintsProofs,
-    bytes[] calldata pricingProofs,
+    uint256[] calldata lengths,
     uint256[] calldata preimages
   ) external payable {
     require(preimages.length % 4 == 0, "LeasingAgent: incorrect preimage length");
     require(preimages.length / names.length == 4, "LeasingAgent: incorrect preimage length");
     revealImage(names, preimages);
-    register(names, quantities, constraintsProofs, pricingProofs);
+    register(names, lengths, quantities);
   }
   
   function revealImage(uint256[] calldata names, uint256[] calldata preimages) internal {
